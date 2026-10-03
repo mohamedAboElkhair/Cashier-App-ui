@@ -1,34 +1,100 @@
 import 'package:flutter/material.dart';
-import 'package:templet/core/styling/app_colors.dart';
+import 'package:flutter/services.dart';
 
+/// A modern, highly-customizable text form field widget.
+///
+/// Designed with sleek rounded borders (12px), subtle slate tints,
+/// smooth focus states, integrated label support, and error handling
+/// that avoids height clipping.
 class TextFieldWidget extends StatelessWidget {
+  /// Optional label displayed directly above the text field.
+  final String? label;
+  final TextStyle? labelStyle;
+  final bool isRequired;
+
+  /// Inner hint/placeholder text.
   final String? hintText;
+  final TextStyle? hintStyle;
+
+  /// Helper or counter text shown under the field.
+  final String? helperText;
+
+  /// Accessory widgets.
+  final Widget? prefixIcon;
+  final Widget? prefix;
   final Widget? suffixIcon;
+  final Widget? suffix;
+
+  /// Dimensions & Layout.
   final double? width;
   final double? height;
+  final EdgeInsetsGeometry? contentPadding;
+  final double borderRadius;
+
+  /// Input behavior & State.
   final bool? isPassword;
+  final bool readOnly;
+  final bool enabled;
   final int? maxLines;
+  final int? minLines;
   final TextEditingController? controller;
-  final String? Function(String?)? validator;
+  final FocusNode? focusNode;
   final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
   final AutovalidateMode? autovalidateMode;
   final Iterable<String>? autofillHints;
+  final List<TextInputFormatter>? inputFormatters;
+
+  /// Validation.
+  final String? Function(String?)? validator;
+
+  /// Callbacks.
+  final void Function(String)? onChanged;
+  final void Function(String)? onFieldSubmitted;
+  final VoidCallback? onTap;
+
+  /// Color customization.
   final Color? fillColor;
+  final Color? borderColor;
+  final Color? focusedBorderColor;
+  final TextStyle? style;
 
   const TextFieldWidget({
     super.key,
+    this.label,
+    this.labelStyle,
+    this.isRequired = false,
     this.hintText,
+    this.hintStyle,
+    this.helperText,
+    this.prefixIcon,
+    this.prefix,
     this.suffixIcon,
+    this.suffix,
     this.width,
-    this.isPassword,
-    this.controller,
-    this.validator,
     this.height,
+    this.contentPadding,
+    this.borderRadius = 12.0,
+    this.isPassword,
+    this.readOnly = false,
+    this.enabled = true,
+    this.controller,
+    this.focusNode,
+    this.validator,
     this.keyboardType,
+    this.textInputAction,
     this.autovalidateMode,
     this.maxLines,
+    this.minLines,
     this.autofillHints,
+    this.inputFormatters,
+    this.onChanged,
+    this.onFieldSubmitted,
+    this.onTap,
     this.fillColor,
+    this.borderColor,
+    this.focusedBorderColor,
+    this.style,
   });
 
   @override
@@ -36,73 +102,180 @@ class TextFieldWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-    return SizedBox(
-      width: width ?? 331,
-      height: height ?? 60,
-      child: TextFormField(
-        // `maxLines` was only ever wired to `minLines` here, leaving the
-        // inner field's actual `maxLines` at TextFormField's own default (1).
-        // That's harmless while every caller passes null (minLines: null,
-        // maxLines: 1 — unchanged), but the first caller to pass e.g.
-        // `maxLines: 3` for a real multi-line box (penalties issue-note,
-        // Task 8) would hit `minLines: 3, maxLines: 1` and trip Flutter's
-        // `maxLines >= minLines` assertion. Wiring maxLines through (falling
-        // back to 1, matching the previous implicit default) fixes that
-        // without changing behavior for any existing single-line caller.
-        minLines: maxLines,
-        maxLines: maxLines ?? 1,
-        keyboardType: keyboardType ?? TextInputType.text,
-        controller: controller ?? TextEditingController(),
-        validator: validator,
-        autovalidateMode: autovalidateMode ?? AutovalidateMode.disabled,
-        autofillHints: autofillHints,
-        cursorColor: scheme.primary,
-        autofocus: false,
-        obscureText: isPassword ?? false,
-        // Typed text must contrast the fill in BOTH themes (was inheriting the
-        // near-white dark body color onto a light fill -> invisible data).
-        style: TextStyle(
-          color: fillColor != null
-              ? Colors.black
-              : (isDark ? scheme.onSurface : Colors.black),
+
+    // Palette tokens: subtle slate background & crisp borders
+    final effectiveFillColor = fillColor ??
+        (isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC));
+
+    final effectiveBorderColor = borderColor ??
+        (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0));
+
+    final effectiveFocusedBorderColor =
+        focusedBorderColor ?? scheme.primary;
+
+    // Text color contrast check
+    final effectiveTextColor = style?.color ??
+        (fillColor != null
+            ? (isDark && fillColor == const Color(0xFF1E293B)
+                ? Colors.white
+                : const Color(0xFF0F172A))
+            : (isDark ? scheme.onSurface : const Color(0xFF0F172A)));
+
+    final effectiveHintColor = hintStyle?.color ??
+        (isDark ? const Color(0xFF94A3B8) : const Color(0xFF94A3B8));
+
+    final radius = BorderRadius.circular(borderRadius);
+
+    Widget field = TextFormField(
+      controller: controller,
+      focusNode: focusNode,
+      obscureText: isPassword ?? false,
+      readOnly: readOnly,
+      enabled: enabled,
+      minLines: isPassword == true ? 1 : (minLines ?? maxLines),
+      maxLines: isPassword == true ? 1 : (maxLines ?? 1),
+      keyboardType: keyboardType ?? TextInputType.text,
+      textInputAction: textInputAction,
+      validator: validator,
+      autovalidateMode: autovalidateMode ?? AutovalidateMode.disabled,
+      autofillHints: autofillHints,
+      inputFormatters: inputFormatters,
+      onChanged: onChanged,
+      onFieldSubmitted: onFieldSubmitted,
+      onTap: onTap,
+      cursorColor: effectiveFocusedBorderColor,
+      cursorWidth: 1.8,
+      cursorRadius: const Radius.circular(2),
+      style: TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        color: effectiveTextColor,
+      ).merge(style),
+      decoration: InputDecoration(
+        hintText: hintText ?? '',
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: effectiveHintColor,
+        ).merge(hintStyle),
+        helperText: helperText,
+        prefixIcon: prefixIcon != null
+            ? IconTheme(
+                data: IconThemeData(
+                  color: isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B),
+                  size: 20,
+                ),
+                child: prefixIcon!,
+              )
+            : null,
+        prefix: prefix,
+        suffixIcon: suffixIcon != null
+            ? IconTheme(
+                data: IconThemeData(
+                  color: isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B),
+                  size: 20,
+                ),
+                child: suffixIcon!,
+              )
+            : null,
+        suffix: suffix,
+        filled: true,
+        fillColor: enabled
+            ? effectiveFillColor
+            : effectiveFillColor.withValues(alpha: 0.5),
+        contentPadding: contentPadding ??
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        isDense: false,
+        border: OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: BorderSide(color: effectiveBorderColor, width: 1.0),
         ),
-        decoration: InputDecoration(
-          hintText: hintText ?? "",
-          hintStyle: TextStyle(
-            fontSize: 15,
-            color: isDark ? const Color(0xff8b93a7) : const Color(0xff8391A1),
-            fontWeight: FontWeight.w400,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: BorderSide(color: effectiveBorderColor, width: 1.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: BorderSide(
+            color: effectiveFocusedBorderColor,
+            width: 1.8,
           ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 18,
-            vertical: 18,
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: const BorderSide(
+            color: Color(0xFFEF4444),
+            width: 1.2,
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: AppColore.welletFlap, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: const BorderSide(
+            color: Color(0xFFEF4444),
+            width: 1.8,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(
-              color: isDark ? AppColore.welletFlap : const Color(0xffEBECF4),
-              width: 1,
-            ),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: BorderSide(
+            color: effectiveBorderColor.withValues(alpha: 0.4),
+            width: 1.0,
           ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.red, width: 1),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.red, width: 1),
-          ),
-          filled: true,
-          fillColor:
-              fillColor ??
-              (isDark ? const Color(0xff1b2130) : const Color(0xffF7F8F9)),
-          suffixIcon: suffixIcon,
+        ),
+        errorStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFFEF4444),
         ),
       ),
     );
+
+    // Apply explicit dimensions if caller provided them
+    if (height != null) {
+      field = SizedBox(height: height, child: field);
+    }
+    if (width != null) {
+      field = SizedBox(width: width, child: field);
+    }
+
+    // Render top label if present
+    if (label != null) {
+      final defaultLabelStyle = TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+        letterSpacing: 0.1,
+      );
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label!, style: defaultLabelStyle.merge(labelStyle)),
+              if (isRequired)
+                const Text(
+                  ' *',
+                  style: TextStyle(
+                    color: Color(0xFFEF4444),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          field,
+        ],
+      );
+    }
+
+    return field;
   }
 }
