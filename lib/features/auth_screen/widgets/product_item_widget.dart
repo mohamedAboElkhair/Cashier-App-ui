@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:templet/core/styling/app_styles.dart';
-import 'package:templet/features/widgets%20copy/space_widgets.dart';
+import 'package:templet/features/widgets/space_widgets.dart';
 
 class ProductItemWidget extends StatelessWidget {
   final String title;

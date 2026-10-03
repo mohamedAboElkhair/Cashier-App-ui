@@ -6,10 +6,10 @@ import 'package:templet/core/styling/app_colors.dart';
 import 'package:templet/features/auth_screen/cubit/auth_cubit.dart';
 import 'package:templet/features/auth_screen/cubit/auth_state.dart';
 import 'package:templet/features/auth_screen/models/user_model.dart';
-import 'package:templet/features/widgets%20copy/app_bar_widget.dart';
-import 'package:templet/features/widgets%20copy/loading_widget.dart';
-import 'package:templet/features/widgets%20copy/primay_button_widget.dart';
-import 'package:templet/features/widgets%20copy/text_field_widget.dart';
+import 'package:templet/features/widgets/app_bar_widget.dart';
+import 'package:templet/features/widgets/loading_widget.dart';
+import 'package:templet/features/widgets/primay_button_widget.dart';
+import 'package:templet/features/widgets/text_field_widget.dart';
 import 'package:templet/generated/locale_keys.g.dart';
 
 class AccoutUserScreen extends StatefulWidget {

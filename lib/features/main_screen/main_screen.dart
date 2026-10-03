@@ -6,7 +6,7 @@ import 'package:templet/core/utils/service_locator.dart';
 import 'package:templet/features/auth_screen/accout_user_screen.dart';
 import 'package:templet/features/auth_screen/cubit/auth_cubit.dart';
 import 'package:templet/features/auth_screen/users_screen.dart';
-import 'package:templet/features/widgets%20copy/app_br_widget.dart';
+import 'package:templet/features/widgets/app_br_widget.dart';
 import 'package:templet/generated/locale_keys.g.dart';
 
 class _NavigationDestination {

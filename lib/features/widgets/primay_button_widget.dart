@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:templet/core/styling/app_colors.dart';
-import 'package:templet/features/widgets%20copy/space_widgets.dart';
+import 'package:templet/features/widgets/space_widgets.dart';
 
 class PrimayButtonWidget extends StatelessWidget {
   final String? buttonText;

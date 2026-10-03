@@ -8,8 +8,8 @@ import 'package:templet/core/styling/app_assets.dart';
 import 'package:templet/core/styling/app_colors.dart';
 import 'package:templet/features/auth_screen/cubit/auth_cubit.dart';
 import 'package:templet/features/auth_screen/cubit/auth_state.dart';
-import 'package:templet/features/widgets%20copy/primay_button_widget.dart';
-import 'package:templet/features/widgets%20copy/text_field_widget.dart';
+import 'package:templet/features/widgets/primay_button_widget.dart';
+import 'package:templet/features/widgets/text_field_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
